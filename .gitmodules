@@ -1,3 +1,11 @@
 [submodule "FrontendReactForDiploma"]
-	path = FrontendReactForDiploma
+	path = frontend
 	url = https://github.com/DariaVerseau/FrontendReactForDiploma
+
+[submodule "mlServiceForDiploma"]
+	path = ml-service
+	url = https://github.com/DariaVerseau/mlServiceForDiploma	
+
+[submodule "backendGoGInForDiploma"]
+	path = backend
+	url = https://github.com/DariaVerseau/backendGoGInForDiploma		
