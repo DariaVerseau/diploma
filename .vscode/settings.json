@@ -2,6 +2,7 @@
   "python.analysis.extraPaths": [
     "./ml-service/colorization",
     "./ml-service/Real-ESRGAN",
-    "./ml-service/CodeFormer"
+    "./ml-service/CodeFormer",
+    "./ml-service/DDColor"
   ]
 }
