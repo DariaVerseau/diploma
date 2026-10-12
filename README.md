@@ -187,40 +187,66 @@ python tests/test_ml.py
 
 ```
 diploma/
-├── backend/                    # API Gateway (Go)
-│   ├── cmd/server/main.go
+├── backend/                        # Go API Gateway
+│   ├── cmd/
+│   │   └── server/
+│   │       └── main.go            # Точка входа
 │   ├── internal/
-│   │   ├── auth/              # JWT
-│   │   ├── handlers/          # Обработчики
-│   │   ├── middleware/        # Auth middleware
-│   │   ├── models/            # Модели данных
-│   │   ├── repositories/      # Доступ к БД
-│   │   ├── services/          # Бизнес-логика
-│   │   └── storage/           # Локальное хранилище
+│   │   ├── auth/                  # JWT аутентификация
+│   │   ├── handlers/              # HTTP обработчики
+│   │   ├── middleware/            # Middleware (auth, logger)
+│   │   ├── models/                # Модели данных
+│   │   ├── repositories/          # Работа с БД
+│   │   ├── services/              # Бизнес-логика
+│   │   └── storage/               # Файловое хранилище
+│   ├── uploads/                   # Загруженные файлы
 │   ├── Dockerfile
-│   └── go.mod
-├── frontend/                   # React-приложение
+│   ├── go.mod
+│   └── go.sum
+│
+├── frontend/                       # React + Vite
+│   ├── dist/                      # Production build
+│   ├── node_modules/
 │   ├── src/
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   └── services/
+│   │   ├── components/            # React компоненты
+│   │   ├── hooks/                 # Custom hooks
+│   │   ├── pages/                 # Страницы приложения
+│   │   ├── services/              # API client
+│   │   ├── App.jsx                # Корневой компонент
+│   │   ├── index.css              # Глобальные стили
+│   │   └── main.jsx               # Точка входа
 │   ├── Dockerfile
-│   └── package.json
-├── ml-service/                 # ML-микросервис (Python)
-│   ├── processors/            # Модули обработки
-│   ├── CodeFormer/            # Модель CodeFormer
-│   ├── pytorch-AdaIN/         # Модель AdaIN
-│   ├── style/                 # Стили для переноса
-│   ├── main.py
+│   ├── nginx.conf                 # Nginx конфигурация
+│   ├── index.html
+│   ├── package.json
+│   ├── vite.config.js
+│   └── tailwind.config.js
+│
+├── ml-service/                     # Python ML Service
+│   ├── __pycache__/
+│   ├── .vscode/
+│   ├── CodeFormer/                # Модель восстановления лиц
+│   ├── processors/                # Обработчики изображений
+│   ├── pytorch-AdaIN/             # Модель переноса стиля
+│   ├── Real-ESRGAN/               # Модель апскейлинга
+│   ├── results/                   # Результаты обработки
+│   ├── temp_content/              # Временные файлы
+│   ├── venv/                      # Python virtual env
+│   ├── main.py                    # FastAPI приложение
 │   ├── Dockerfile
+│   ├── README.md
 │   └── requirements.txt
-├── style/                      # Изображения стилей
-├── tests/                      # Тесты
-│   ├── test_backend.py
-│   ├── test_ml.py
+│
+├── style/                          # Примеры стилей
+├── tests/                          # Интеграционные тесты
+│   ├── test.py
 │   └── requirements.txt
-├── docker-compose.yml
-└── .env
+│
+├── docker-compose.yml              # Docker оркестрация
+├── .env                            # Переменные окружения
+├── .dockerignore
+└── .gitignore
+
 ```
 
 ---
