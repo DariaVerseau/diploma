@@ -1,24 +1,38 @@
 services:
+  migrate:
+    image: juhokoskela/goose:latest
+    volumes:
+      - ./backend/migrations:/migrations:ro
+    environment:
+      - GOOSE_DRIVER=postgres
+      - GOOSE_DBSTRING=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable
+    command: ["up"]
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - image-net
+    restart: "no"
+
   api:
     build:
       context: ./backend
       dockerfile: Dockerfile
     env_file:
       - .env
+    environment:
+      - ML_SERVICE_URL=http://ml-service:8000
     ports:
       - "8080:8080"
-    environment:
-      - SERVER_PORT=${SERVER_PORT}
-      - DATABASE_URL=${DATABASE_URL}
-      - JWT_SECRET=${JWT_SECRET}
-    working_dir: 
-      /app  
+    working_dir: /app
     volumes:
       - ./uploads:/app/uploads
       - ./style:/app/style
     depends_on:
-      - db
-      #- ml-service
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     networks:
       - image-net
     restart: unless-stopped
@@ -31,20 +45,28 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - image-net
     restart: unless-stopped
 
   ml-service:
-    volumes:
-      - ./style:/app/style
     build:
       context: ./ml-service
       dockerfile: Dockerfile
     env_file:
       - ./ml-service/.env
     environment:
-      - DEVICE=cpu     
+      - DEVICE=cpu
+    volumes:
+      - ./style:/app/style
     networks:
       - image-net
     restart: unless-stopped
