@@ -1,6 +1,6 @@
 services:
   migrate:
-    image: juhokoskela/goose:latest
+    image: juhokoskela/goose@sha256:f08c8a3b59c91f4df992ad07e4c9e118242105c3f113dbc4565f4c5a42af1f4d
     volumes:
       - ./backend/migrations:/migrations:ro
     environment:
@@ -38,15 +38,14 @@ services:
     restart: unless-stopped
 
   db:
-    image: postgres:15
+    image: postgres@sha256:724292da1f2e50bdccfc3302ce75bbba7f4a6076701b588cc795fcac65683550
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    # ports убраны — только из docker-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
@@ -55,7 +54,7 @@ services:
       start_period: 10s
     networks:
       - image-net
-    restart: unless-stopped
+    restart: always   # ← для БД
 
   ml-service:
     build:
@@ -70,6 +69,12 @@ services:
     networks:
       - image-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   frontend:
     build:
@@ -82,6 +87,11 @@ services:
     networks:
       - image-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
 volumes:
   postgres_data:
